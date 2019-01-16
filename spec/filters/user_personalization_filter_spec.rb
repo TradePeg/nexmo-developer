@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe UserPersonalizationFilter do
-  it 'returns input if there is no user defined' do
+  it 'returns input if it does not match filter' do
     input = <<~HEREDOC
       no options defined here
     HEREDOC
@@ -55,27 +55,6 @@ RSpec.describe UserPersonalizationFilter do
     expect(filter.call(input)).to eql(expected_output)
   end
 
-  it 'returns input if api_key and api_secret is blank' do
-    filter = UserPersonalizationFilter.new({
-        current_user: blank_api_key_and_secret_user_mock,
-    })
-    input = <<~HEREDOC
-      <pre><code>
-      NEXMO_API_KEY
-      NEXMO_API_SECRET
-      </code></pre>
-    HEREDOC
-
-    expected_output = <<~HEREDOC
-      <pre><code>
-      NEXMO_API_KEY
-      NEXMO_API_SECRET
-      </code></pre>
-    HEREDOC
-
-    expect(filter.call(input)).to eql(expected_output)
-  end
-
   it 'returns input if input does not match but a valid user is provided' do
     filter = UserPersonalizationFilter.new({
         current_user: correct_user_mock,
@@ -98,15 +77,13 @@ RSpec.describe UserPersonalizationFilter do
     })
     input = <<~HEREDOC
       <pre><code>
-      NEXMO_API_KEY
-      NEXMO_API_SECRET
+      GET https://rest.nexmo.com/account/balance?api_key=NEXMO_API_KEY&api_secret=NEXMO_API_SECRET
       </code></pre>
     HEREDOC
 
     expected_output = <<~HEREDOC
       <pre><code>
-      '12335'
-      '123456'
+      GET https://rest.nexmo.com/account/balance?api_key='12335'&amp;api_secret='123456'
       </code></pre>
     HEREDOC
 
